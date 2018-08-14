@@ -20,10 +20,9 @@ mongo = PyMongo(app)
 # GET METHOD -OK-
 @app.route('/persona/<nombre>', methods=['GET'])
 def persona_get(nombre):
-    # a través de la url /pedir/opcion devuelvo un json con el índice = opcion"""
+    # a través de la url /pedir/opcion devuelvo un json con el índice = opcion
     personas = mongo.db.personas
     resp = personas.find_one({"nombre": nombre})
-
     # Si no existe, not found
     if resp is None:
         # return not_found()
@@ -78,4 +77,5 @@ def not_found(error=None):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True, host="0.0.0.0", port="5000")
+    app.run(host="0.0.0.0", port="5000")
