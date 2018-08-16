@@ -43,7 +43,7 @@
 
 ## Getting Started
 
-* Clone (or download) a copy of the repository in your machine
+* Clone (or download) a copy of this repository into your machine
 * ???
 * Enjoy
 
