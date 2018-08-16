@@ -1,10 +1,7 @@
-from flask import Flask
-from flask import request
+from flask import Flask, jsonify, request, abort
 from flask_pymongo import PyMongo
 # ------------------------------
 # para convertir a json
-from flask import jsonify
-from flask import abort
 from bson import json_util, ObjectId
 import json
 
@@ -24,8 +21,8 @@ def persona_get(nombre):
     personas = mongo.db.personas
     resp = personas.find_one({"nombre": nombre})
     # Si no existe, not found
-    if resp is None:
-        # return not_found()
+    if nombre:
+        
         abort(404)
 
     """ Para SERIALIZAR un diccionario que viene de MONGODB y poder convertirlo a JSON
