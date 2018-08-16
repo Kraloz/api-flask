@@ -26,7 +26,7 @@
                 "valor" : valor del sensor
                  }
                  ```
-    * ```Returns a JSON (Content-type: application/json) the sensor info of a specific sensor```
+    * ```Returns a JSON (Content-type: application/json) with the sensor info of a specific sensor```
 * Crear Sensor:
     * ``` PUT /sensores/<int:id> ```
         * RequestBody :
