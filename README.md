@@ -46,6 +46,7 @@
 * Clone (or download) a copy of the repository in your machine
 * ???
 * Enjoy
+
 ### Prerequisites
 
 * [Python](https://www.python.org/)
@@ -56,7 +57,7 @@
 cd /api-flask-master
 pip install -r requirements.txt
 ```
-### Runing
+### Running
 ```
 cd /api-flask-master
 python ./apy.py
