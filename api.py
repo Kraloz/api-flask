@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, jsonify, url_for, redirect, request
 from flask_restful import Api, Resource, reqparse
-from flask_sqlalchemy import SQLAlchemy
-# ------------------------------
-# para convertir a json
-from bson import json_util, ObjectId
-import json
 
 
 app = Flask(__name__)
