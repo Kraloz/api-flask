@@ -1,53 +1,134 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, jsonify, url_for, redirect, request
-from flask_restful import Api, Resource, reqparse
 
+from flask import Flask, jsonify, url_for, redirect, request
+
+from flask_restful import Api, Resource, reqparse
+from flask_sqlalchemy import SQLAlchemy
+
+from settings import DB_URI
 
 app = Flask(__name__)
 
+app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ECHO'] = False
 
-""" ClassRestful definition """
+db = SQLAlchemy(app)
+
+
+""" Modelo de tabla de BD
+"""
+class ModelSensor(db.Model):
+    __tablename__ = "sensores"
+    """ Representación de los campos
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    descripcion = db.Column(db.String(45), unique=False, nullable=True)
+    # tipo_sens = Column(Enum(TipoSensores))
+    valor = db.Column(db.Integer, unique=False, nullable=True)
+
+    def as_dict(self):    
+        return {"id": self.id, "descripcion": self.descripcion, "valor": self.valor}
+       
+
+    def __repr__(self):
+        return "<Sensor : {}, {}, {}>".format(self.id, self.descripcion, self.valor)
+
+
+""" Definition of resource classes: """
+
+class Index(Resource):
+    def get(self):
+        """ Redirecciona al repositorio original del proyecto """
+        
+        return redirect("https://github.com/Kraloz/api-flask", code=302)
+
+
 class SensorList(Resource):
     def get(self):
-        # TODO hacer que esto muestre el README.md
-        return jsonify(sensores,200)
+        """ Returns ALL the sensors from the db """
+
+        lista_sensores = []
+        
+        # SELECT * FROM SENSORES
+        for r in ModelSensor.query.all():
+            lista_sensores.append(r.as_dict())
+
+        return jsonify({"sensores": lista_sensores})
 
 
 class Sensor(Resource):
+    # FUNCIONA
     def get(self, id=None):
-        if id:
-            # SELECT * FROM SENSORES
-            pass
-        else:
-            # SELECT * FROM SENSORES WHERE ID = "id";
-            pass
-        pass    
+        """ Returns the requested sensor """
+
+        # SELECT * FROM SENSORES WHERE ID = "id";
+        sensor = ModelSensor.query.get_or_404(id)
+
+        return jsonify({"sensor": sensor.as_dict()})
 
 
+    """ ***WIP***
     def post(self):
-        json_data = request.get_json(force=True)
-        # INSERT INTO `sensores` (desc, tipo_sens, valor) VALUES (json_data["desc"],json_data["tipo_sens"],json_data["valor"]);
-        pass
+        json_data = request.get_json()
+        # INSERT INTO `sensores` (descripcion, tipo_sens, valor) VALUES (...);
+        sens = Sensor(json_data["descripcion"], json_data["valor"])
+        db.session.add(sens)
+        db.session.commit()
+        # Location: 
+        response = jsonify()
+        response.status_code = 201
+        response.headers['location'] = "/sensores/"+sens.id
+        response.autocorrect_location_header = False
+        return response
+    """
+
+    # WORKING
+    def put(self, id=None):
+        """ Updates the "valor" field of the sensor requested """
+        json_data = request.get_json()
+
+        sensor = ModelSensor.query.get_or_404(id)
+        sensor.valor = json_data["valor"]
+
+        db.session.commit()
+
+        response = jsonify()
+        response.status_code = 204
+
+        return response
 
 
-    def put(self):
+    # WORKING
+    def delete(self, id=None):
+        """ Deletes the sensor requested from the db """ 
         
-        pass
+        sensor = ModelSensor.query.get_or_404(id)
+
+        # DELETE * FROM SENSORES WHERE ID = ID;
+        db.session.delete(sensor)
+        db.session.commit()  
+
+        response = jsonify()
+        response.status_code = 204      
+        
+        return response
 
 
-    def delete(self):
-        json_data = request.get_json(force=True)
-        # DELETE * FROM SENSORES WHERE ID = json_data["id"];
-        pass
-
-
-
-"""API routes definition"""
+"""Definition of resource routes: """
 
 api = Api(app)
 
-api.add_resource(SensorList, "/", endpoint="index")
+api.add_resource(Index, "/api/", endpoint="index")
+
+api.add_resource(SensorList, "/api/sensores/", endpoint="sensores")
+
 api.add_resource(Sensor, "/api/sensores/<int:id>", endpoint="sensor")
+
+api.add_resource(Sensor, "/api/sensores/", endpoint="sensorPost")
+api.add_resource(Sensor, "/api/sensores/<int:id>/valor", endpoint="sensorUpdate")
+api.add_resource(Sensor, "/api/sensores/<int:id>", endpoint="sensorDelete")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
