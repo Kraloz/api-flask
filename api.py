@@ -54,7 +54,7 @@ class SensorList(Resource):
         for r in ModelSensor.query.all():
             lista_sensores.append(r.as_dict())
 
-        return jsonify({"sensores": lista_sensores})
+        return jsonify({"sensores": lista_sensores}),200
 
 
 class Sensor(Resource):
@@ -65,23 +65,26 @@ class Sensor(Resource):
         # SELECT * FROM SENSORES WHERE ID = "id";
         sensor = ModelSensor.query.get_or_404(id)
 
-        return jsonify({"sensor": sensor.as_dict()})
+        return jsonify({"sensor": sensor.as_dict()}),200
 
 
-    """ ***WIP***
     def post(self):
+        # OK        
         json_data = request.get_json()
         # INSERT INTO `sensores` (descripcion, tipo_sens, valor) VALUES (...);
-        sens = Sensor(json_data["descripcion"], json_data["valor"])
+
+        sens = ModelSensor(descripcion=json_data["descripcion"], valor=json_data["valor"])
+        
         db.session.add(sens)
         db.session.commit()
-        # Location: 
+        # Respuesta: 
         response = jsonify()
         response.status_code = 201
-        response.headers['location'] = "/sensores/"+sens.id
+        # Location header: 
+        response.headers['Location'] = "/sensores/{}".format(sens.id)
         response.autocorrect_location_header = False
         return response
-    """
+
 
     # WORKING
     def put(self, id=None):
@@ -131,4 +134,4 @@ api.add_resource(Sensor, "/api/sensores/<int:id>", endpoint="sensorDelete")
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0",debug=True)
