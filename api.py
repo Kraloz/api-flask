@@ -47,7 +47,6 @@ class Index(Resource):
 class SensorList(Resource):
     def get(self):
         """ Returns ALL the sensors from the db """
-
         lista_sensores = []
         
         # SELECT * FROM SENSORES
